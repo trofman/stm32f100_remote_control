@@ -17,6 +17,14 @@
 "remotecontrol\main.o"
 "remotecontrol\stm32f1xx_hal_msp.o"
 "remotecontrol\stm32f1xx_it.o"
+"remotecontrol\mb.o"
+"remotecontrol\mbtcp.o"
+"remotecontrol\mbcrc.o"
+"remotecontrol\mbrtu.o"
+"remotecontrol\portevent.o"
+"remotecontrol\portserial.o"
+"remotecontrol\porttimer.o"
+"remotecontrol\registers.o"
 "remotecontrol\mbascii.o"
 "remotecontrol\mbfunccoils.o"
 "remotecontrol\mbfuncdiag.o"
@@ -25,15 +33,7 @@
 "remotecontrol\mbfuncinput.o"
 "remotecontrol\mbfuncother.o"
 "remotecontrol\mbutils.o"
-"remotecontrol\portevent.o"
-"remotecontrol\portserial.o"
-"remotecontrol\porttimer.o"
-"remotecontrol\registers.o"
-"remotecontrol\mbcrc.o"
-"remotecontrol\mbrtu.o"
-"remotecontrol\mbtcp.o"
-"remotecontrol\mb.o"
 --library_type=microlib --strict --scatter "RemoteControl\RemoteControl.sct"
---diag_suppress=L6329 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "RemoteControl.map" -o RemoteControl\RemoteControl.axf

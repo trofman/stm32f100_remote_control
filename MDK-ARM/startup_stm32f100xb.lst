@@ -500,11 +500,11 @@ ARM Macro Assembler    Page 8
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=remotecontrol\startup_stm32f100xb.d -oremotecontrol\startup_stm32f
-100xb.o -I..\Inc -IC:\Users\user\Desktop\RemoteControlProject\MDK-ARM\RTE -IC:\
-Keil_v5\ARM\PACK\CMSIS\Include -IC:\Keil_v5\ARM\PACK\Device\Include --predefine
-="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 521" --predefine="_RTE
-_ SETA 1" --predefine="STM32F10X_MD_VL SETA 1" --list=startup_stm32f100xb.lst s
-tartup_stm32f100xb.s
+100xb.o -I.\RTE\_RemoteControl -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Incl
+ude -IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include --predefine="
+__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION S
+ETA 524" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_MD_VL SETA 1" --list
+=startup_stm32f100xb.lst startup_stm32f100xb.s
 
 
 
@@ -1193,4 +1193,4 @@ Symbol: __main
       At line 165 in file startup_stm32f100xb.s
 Comment: __main used once
 2 symbols
-404 symbols in table
+405 symbols in table

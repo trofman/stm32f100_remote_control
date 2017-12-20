@@ -37,7 +37,7 @@
 #define SLAVE_ADDRESS               7
 #define USB			                0
 #define RS_485						1
-#define BAUDRATE                    115200
+#define BAUDRATE                    9600
 
 typedef uint8_t BOOL;
 

@@ -41,7 +41,7 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
     htim.Instance = TIM6;
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim.Init.Prescaler = (HAL_RCC_GetPCLK1Freq() / 1000000) - 1;
-    htim.Init.Period = 50 - 1;
+    htim.Init.Period = 0;
     
     timeout = usTim1Timerout50us;
     

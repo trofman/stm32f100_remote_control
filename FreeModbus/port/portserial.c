@@ -161,7 +161,8 @@ static void prvvUARTRxISR( void )
 }
 
 BOOL UART_IRQ_Handler(USART_TypeDef *usart) {
-    if (huart.Instance == usart) {
+    if (huart.Instance == usart) 
+    {
         if ((__HAL_UART_GET_FLAG(&huart, UART_FLAG_RXNE) != RESET) &&
             (__HAL_UART_GET_IT_SOURCE(&huart, UART_IT_RXNE) != RESET)) {
                 prvvUARTRxISR();
