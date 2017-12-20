@@ -39,13 +39,19 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 
+/* Modbus RTU */
+#include "mb.h"
+#include "mbport.h"
+#include "registers.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim6;
 
+GPIO_InitTypeDef GPIO_InitStruct;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
@@ -103,7 +109,8 @@ int main(void)
   MX_NVIC_Init();
 
   /* USER CODE BEGIN 2 */
-
+  eMBInit(MB_RTU, SLAVE_ADDRESS, USB, BAUDRATE, MB_PAR_NONE);
+  eMBEnable();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -111,7 +118,8 @@ int main(void)
   while (1)
   {
   /* USER CODE END WHILE */
-
+    eMBPoll();
+    VALUE_REG = 1;
   /* USER CODE BEGIN 3 */
 
   }
@@ -231,6 +239,29 @@ static void MX_TIM1_Init(void)
 
 }
 
+/* TIM6 init function */
+void MX_TIM6_Init(void)
+{
+  TIM_MasterConfigTypeDef sMasterConfig;
+
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 31;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 49;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
 /* USART1 init function */
 static void MX_USART1_UART_Init(void)
 {
@@ -247,6 +278,15 @@ static void MX_USART1_UART_Init(void)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+  GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* USART1 interrupt Init */
+  HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
 
 }
 
@@ -262,7 +302,7 @@ static void MX_USART1_UART_Init(void)
 static void MX_GPIO_Init(void)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+  
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
