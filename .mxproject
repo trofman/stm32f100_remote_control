@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Project/University/RemoteControl/Program/Inc
+HeaderPath=C:/Users/user/Desktop/GIT/stm32f100_RemoteControl-develop/Inc
 HeaderFiles=stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;
-SourcePath=C:/Project/University/RemoteControl/Program/Src
+SourcePath=C:/Users/user/Desktop/GIT/stm32f100_RemoteControl-develop/Src
 SourceFiles=stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;stm32f1xx_it.c;stm32f1xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]

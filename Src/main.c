@@ -40,11 +40,12 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 
+/* USER CODE BEGIN Includes */
+
 /* Modbus RTU */
 #include "mb.h"
 #include "mbport.h"
 #include "registers.h"
-/* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
@@ -119,10 +120,212 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    VALUE_REG = 100;
+    static float PWM_duty = 0, TIM_period = 0, PWM_value = 0, analog_value = 0;
+    static char button, led1, led2, led3, led_flag, prev_pos, counter_DT, counter_clk; 
+    static int  counter = 0;
+    button = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
+    counter_DT = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+    counter_clk = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+
+    /* HC-SR04 value (echo) to % */
+    /*
+    if ((counter_echo_flag == ON) && (echo_pulse == ON))
+      counter_echo++;
+    else if ((counter_echo_flag == ON) && (echo_pulse == OFF))
+      counter_echo_flag = OFF;
+    if ((button_stm32 == ON) || (trigger_flag == OFF))
+    {
+        counter_echo_flag == ON;
+        trigger_flag = ON;
+    }
+    if (trigger_flag == ON)
+		{
+      for (int i = 0; i < 50; i++)
+				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+		}
+    */
+
+    /* Encoder code */
+    if (counter_DT != prev_pos)
+        {
+            if (counter_DT != counter_clk)
+              analog_value = analog_value + 1;
+            else
+              analog_value = analog_value - 1;;
+            if (analog_value >= 100)
+              analog_value = 100;
+            if (analog_value <= 0)
+              analog_value = 0;
+        }
+
+    if (button == OFF) 
+    {
+      if (analog_value < 20)
+      {
+        led1 = ON;
+        led2 = ON;
+        led3 = ON;
+        PWM_value = 0;
+      }
+      if ((analog_value >= 20) && (analog_value < 60))
+      {
+        counter++;
+        if (led_flag == OFF)
+        {
+          if (counter < LED_BLINK)
+          {
+            led1 = OFF;
+            led_flag = OFF;
+          }
+          else if (counter > LED_BLINK)
+          {
+            led_flag = ON;
+            counter = 0;
+          }
+        }
+        if (led_flag == ON)
+        {
+          if (counter < LED_BLINK)
+          {
+            led1 = ON;
+            led_flag = ON;
+          }
+          else if (counter > LED_BLINK)
+          {
+            led_flag = OFF;
+            counter = 0;
+          }
+        }
+        PWM_value = analog_value;
+      }
+      if ((analog_value >= 60) && (analog_value < 90))
+      {
+        led1 = ON;
+        led3 = ON;
+        counter++;
+        if (led_flag == OFF)
+        {
+          if (counter < LED_BLINK)
+          {
+            led2 = OFF;
+            led_flag = OFF;
+          }
+          else if (counter > LED_BLINK)
+          {
+            led_flag = ON;
+            counter = 0;
+          }
+        }
+        if (led_flag == ON)
+        {
+          if (counter < LED_BLINK)
+          {
+            led2 = ON;
+            led_flag = ON;
+          }
+          else if (counter > LED_BLINK)
+          {
+            led_flag = OFF;
+            counter = 0;
+          }
+        }
+        
+        PWM_value = 60;
+      }
+      if (analog_value >= 90)
+      {
+        led1 = ON;
+        led2 = ON;
+        counter++;
+        if (led_flag == OFF)
+        {
+          if (counter < LED_BLINK)
+          {
+            led3 = OFF;
+            led_flag = OFF;
+          }
+          else if (counter > LED_BLINK)
+          {
+            led_flag = ON;
+            counter = 0;
+          }
+        }
+        if (led_flag == ON)
+        {
+          if (counter < LED_BLINK)
+          {
+            led3 = ON;
+            led_flag = ON;
+          }
+          else if (counter > LED_BLINK)
+          {
+            led_flag = OFF;
+            counter = 0;
+          }
+        }
+        
+        PWM_value = 0;
+      }
+    }
+    else if (button == ON)
+    {
+      led1 = OFF;
+      led2 = OFF;
+      counter++;
+      if (led_flag == OFF)
+      {
+          if (counter < LED_BLINK)
+          {
+            led3 = OFF;
+            led_flag = OFF;
+          }
+          else if (counter > LED_BLINK)
+          {
+            led_flag = ON;
+            counter = 0;
+          }
+      }
+      if (led_flag == ON)
+      {
+        if (counter < LED_BLINK)
+        {
+          led3 = ON;
+          led_flag = ON;
+        }
+        else if (counter > LED_BLINK)
+        {
+          led_flag = OFF;
+          counter = 0;
+        }
+      }
+    PWM_value = (0.3333 * (analog_value));
+		}
+
+      
+
+    if (led3 == ON)
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+    else
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
+    if (led1 == ON)
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+    else
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+    if (led2 == ON)
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+    else
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+
+    /* PWM duty by PWM_value in precent */
+    htim1.Instance = TIM1;
+    TIM_period = htim1.Instance->ARR;
+    PWM_duty = TIM_period * (PWM_value / 100);
+    htim1.Instance->CCR1 = PWM_duty;
+    
     eMBPoll();
   /* USER CODE END WHILE */
-
+    prev_pos = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
   /* USER CODE BEGIN 3 */
 
   }
@@ -182,6 +385,12 @@ static void MX_NVIC_Init(void)
   /* TIM1_UP_TIM16_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM1_UP_TIM16_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
+  /* USART1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
+  /* TIM6_DAC_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
 }
 
 /* TIM1 init function */
@@ -191,7 +400,15 @@ static void MX_TIM1_Init(void)
   TIM_MasterConfigTypeDef sMasterConfig;
   TIM_OC_InitTypeDef sConfigOC;
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
+  GPIO_InitTypeDef GPIO_InitStruct;
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
+  GPIO_InitStruct.Pin = GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  __HAL_RCC_TIM1_IS_CLK_ENABLED();
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 15;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -212,7 +429,7 @@ static void MX_TIM1_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 25000;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -236,6 +453,7 @@ static void MX_TIM1_Init(void)
   }
 
   HAL_TIM_MspPostInit(&htim1);
+  HAL_TIM_PWM_Start_IT(&htim1, TIM_CHANNEL_1);
 
 }
 
@@ -268,6 +486,12 @@ static void MX_TIM6_Init(void)
 static void MX_USART1_UART_Init(void)
 {
 
+
+
+  /* USART1 interrupt Init */
+  __HAL_RCC_USART1_IS_CLK_ENABLED();
+
+
   huart1.Instance = USART1;
   huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
@@ -280,6 +504,9 @@ static void MX_USART1_UART_Init(void)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+
+  HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART2_IRQn);
 
 }
 
@@ -303,33 +530,49 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, LD1_Pin|LD2_Pin|LD3_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : Variable_resistor_Pin */
-  GPIO_InitStruct.Pin = Variable_resistor_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  HAL_GPIO_Init(Variable_resistor_GPIO_Port, &GPIO_InitStruct);
+  /*Configure GPIO pin : HCTrig_Pin, HCEcho_Pin*/
+  /*
+	GPIO_InitStruct.Pin = HCTrig_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_NOPULL;
+  HAL_GPIO_Init(HCTrig_GPIO_Port, &GPIO_InitStruct);
 
+  GPIO_InitStruct.Pin = HCEcho_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_NOPULL;
+  HAL_GPIO_Init(HCEcho_GPIO_Port, &GPIO_InitStruct);
+	*/
+	
   /*Configure GPIO pin : Button_Pin */
+  GPIO_InitStruct.Pin = ENCODER_DT;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+   /*Configure GPIO pin : Button_Pin */
+  GPIO_InitStruct.Pin = ENCODER_CLK;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+   /*Configure GPIO pin : Button_Pin */
   GPIO_InitStruct.Pin = Button_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(Button_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD1_Pin LD2_Pin LD3_Pin */
-  GPIO_InitStruct.Pin = LD1_Pin|LD2_Pin|LD3_Pin;
+  GPIO_InitStruct.Pin = LD3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Mode = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : USART */
-  GPIO_InitStruct.Pin = GPIO_PIN_7;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_6;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = LD1_Pin|LD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 

@@ -17,7 +17,11 @@
 
 extern uint16_t usRegHoldingUserBuf[];
 
-#define VALUE_REG								(usRegHoldingUserBuf[1])
-
+#define BUTTON_VALUE							(usRegHoldingUserBuf[1])
+#define LED_1									(usRegHoldingUserBuf[2])
+#define LED_2									(usRegHoldingUserBuf[3])
+#define LED_3									(usRegHoldingUserBuf[4])
+#define PWM_VALUE								(usRegHoldingUserBuf[5])
+#define ANALOG_VALUE							(usRegHoldingUserBuf[6])
 
 #endif /* _REGISTERS_H */

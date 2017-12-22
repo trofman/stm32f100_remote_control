@@ -46,17 +46,26 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
+#define ON          (1)
+#define OFF         (0)
 
-#define Variable_resistor_Pin GPIO_PIN_0
-#define Variable_resistor_GPIO_Port GPIOB
+
+#define LED_BLINK   (4000)
+
+#define HCTrig_Pin GPIO_PIN_6
+#define HCTrig_GPIO_Port GPIOC
+#define HCEcho_Pin GPIO_PIN_7
+#define HCEcho_GPIO_Port GPIOC
 #define Button_Pin GPIO_PIN_1
 #define Button_GPIO_Port GPIOB
-#define LD1_Pin GPIO_PIN_7
-#define LD1_GPIO_Port GPIOC
-#define LD2_Pin GPIO_PIN_8
-#define LD2_GPIO_Port GPIOC
-#define LD3_Pin GPIO_PIN_9
-#define LD3_GPIO_Port GPIOC
+#define ENCODER_DT GPIO_PIN_0
+#define ENCODER_CLK GPIO_PIN_1
+#define LD1_Pin GPIO_PIN_10
+#define LD1_GPIO_Port GPIOA
+#define LD2_Pin GPIO_PIN_11
+#define LD2_GPIO_Port GPIOA
+#define LD3_Pin GPIO_PIN_8
+#define LD3_GPIO_Port GPIOС
 #define PWM_Pin GPIO_PIN_8
 #define PWM_GPIO_Port GPIOA
 #define TMS_SWDIO_Pin GPIO_PIN_13

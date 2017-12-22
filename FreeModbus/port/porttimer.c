@@ -38,11 +38,14 @@ static uint16_t downcounter = 0;
 BOOL
 xMBPortTimersInit( USHORT usTim1Timerout50us )
 {
+
+
     htim.Instance = TIM6;
+    htim.Init.Prescaler = (HAL_RCC_GetPCLK1Freq() / 1000000) - 1;;
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim.Init.Prescaler = (HAL_RCC_GetPCLK1Freq() / 1000000) - 1;
-    htim.Init.Period = 0;
-    
+    htim.Init.Period = 50;
+    htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
     timeout = usTim1Timerout50us;
     
     return HAL_OK == HAL_TIM_Base_Init(&htim) ? TRUE : FALSE;
@@ -54,6 +57,7 @@ vMBPortTimersEnable(  )
 {
     /* Enable the timer with the timeout passed to xMBPortTimersInit( ) */
     downcounter = timeout;
+    htim.Instance = TIM6;
     HAL_TIM_Base_Start_IT(&htim);
 }
 
@@ -61,6 +65,7 @@ inline void
 vMBPortTimersDisable(  )
 {
     /* Disable any pending timers. */
+    htim.Instance = TIM6;
     HAL_TIM_Base_Stop_IT(&htim);
 }
 
@@ -73,8 +78,9 @@ static void prvvTIMERExpiredISR( void )
     ( void )pxMBPortCBTimerExpired(  );
 }
 
-void TIM6_IRQHandler(void)
+void TIM6_IRQHandler_MB(void)
 {
+    htim.Instance = TIM6;
     if ((__HAL_TIM_GET_FLAG(&htim, TIM_FLAG_UPDATE) != RESET) &&
         (__HAL_TIM_GET_IT_SOURCE(&htim, TIM_IT_UPDATE) != RESET)) {
             __HAL_TIM_CLEAR_IT(&htim, TIM_IT_UPDATE);
