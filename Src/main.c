@@ -112,6 +112,7 @@ int main(void)
   MX_NVIC_Init();
 
   /* USER CODE BEGIN 2 */
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   eMBInit(MB_RTU, SLAVE_ADDRESS, USB, BAUDRATE, MB_PAR_NONE);
   eMBEnable();
   /* USER CODE END 2 */
@@ -124,7 +125,7 @@ int main(void)
     static char button, led1, led2, led3, led_flag, prev_pos, counter_DT, counter_clk; 
     static int  counter = 0;
     button = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
-    counter_DT = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+    counter_DT = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2);
     counter_clk = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
 
     /* HC-SR04 value (echo) to % */
@@ -159,6 +160,7 @@ int main(void)
               analog_value = 0;
         }
 
+    /* Main logic */
     if (button == OFF) 
     {
       if (analog_value < 20)
@@ -305,17 +307,17 @@ int main(void)
       
 
     if (led3 == ON)
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+    else
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
+    if (led1 == ON)
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+    else
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+    if (led2 == ON)
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
     else
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
-    if (led1 == ON)
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-    else
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
-    if (led2 == ON)
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
-    else
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
 
     /* PWM duty by PWM_value in precent */
     htim1.Instance = TIM1;
@@ -323,9 +325,11 @@ int main(void)
     PWM_duty = TIM_period * (PWM_value / 100);
     htim1.Instance->CCR1 = PWM_duty;
     
+    prev_pos = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2);
     eMBPoll();
+  
   /* USER CODE END WHILE */
-    prev_pos = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+
   /* USER CODE BEGIN 3 */
 
   }
@@ -346,7 +350,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -356,7 +362,7 @@ void SystemClock_Config(void)
     */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
@@ -400,17 +406,9 @@ static void MX_TIM1_Init(void)
   TIM_MasterConfigTypeDef sMasterConfig;
   TIM_OC_InitTypeDef sConfigOC;
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
-  GPIO_InitTypeDef GPIO_InitStruct;
-  __HAL_RCC_GPIOA_CLK_ENABLE();
 
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  __HAL_RCC_TIM1_IS_CLK_ENABLED();
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 15;
+  htim1.Init.Prescaler = 11;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 50000;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -429,7 +427,7 @@ static void MX_TIM1_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 25000;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -453,7 +451,6 @@ static void MX_TIM1_Init(void)
   }
 
   HAL_TIM_MspPostInit(&htim1);
-  HAL_TIM_PWM_Start_IT(&htim1, TIM_CHANNEL_1);
 
 }
 
@@ -486,9 +483,7 @@ static void MX_TIM6_Init(void)
 static void MX_USART1_UART_Init(void)
 {
 
-
-
-  /* USART1 interrupt Init */
+ /* USART1 interrupt Init */
   __HAL_RCC_USART1_IS_CLK_ENABLED();
 
 
@@ -504,10 +499,6 @@ static void MX_USART1_UART_Init(void)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
-
-  HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(USART2_IRQn);
-
 }
 
 /** Configure pins as 
@@ -528,51 +519,25 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LD1_Pin|LD2_Pin|LD3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LD1_Pin|LD2_Pin|LD3_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pin : HCTrig_Pin, HCEcho_Pin*/
-  /*
-	GPIO_InitStruct.Pin = HCTrig_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Mode = GPIO_NOPULL;
-  HAL_GPIO_Init(HCTrig_GPIO_Port, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = HCEcho_Pin;
+  /*Configure GPIO pins : Encoder_CLK_Pin Encoder_DT_Pin */
+  GPIO_InitStruct.Pin = Encoder_CLK_Pin|Encoder_DT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Mode = GPIO_NOPULL;
-  HAL_GPIO_Init(HCEcho_GPIO_Port, &GPIO_InitStruct);
-	*/
-	
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   /*Configure GPIO pin : Button_Pin */
-  GPIO_InitStruct.Pin = ENCODER_DT;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-   /*Configure GPIO pin : Button_Pin */
-  GPIO_InitStruct.Pin = ENCODER_CLK;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-   /*Configure GPIO pin : Button_Pin */
   GPIO_InitStruct.Pin = Button_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(Button_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD1_Pin LD2_Pin LD3_Pin */
-  GPIO_InitStruct.Pin = LD3_Pin;
+  GPIO_InitStruct.Pin = LD1_Pin|LD2_Pin|LD3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Mode = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = LD1_Pin|LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Mode = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
-<ProjectName>C:\Users\user\Desktop\GIT\stm32f100_RemoteControl-develop\\RemoteControl</ProjectName>
+<ProjectName>C:\Project\University\RemoteControl\Program\\RemoteControl</ProjectName>
 <CMSIS>..\Drivers\CMSIS</CMSIS>
-<HAL_Driver>C:\Users\user\STM32Cube\Repository\STM32Cube_FW_F1_V1.6.0\Drivers\CMSIS</HAL_Driver>
+<HAL_Driver>C:\Users\&#1042;&#1072;&#1089;&#1080;&#1083;&#1080;&#1081;\STM32Cube\Repository\STM32Cube_FW_F1_V1.6.0\Drivers\CMSIS</HAL_Driver>
 
 <Toolchain>MDK-ARM</Toolchain>
 	<Toolversion>4</Toolversion>
@@ -29,7 +29,7 @@
     <heapSize>0x200</heapSize>
     <stackSize>0x400</stackSize>
     
-    	<cpuclock>8</cpuclock>
+    	<cpuclock>24</cpuclock>
     	<board>STM32VLDISCOVERY</board>
 			
     <usedDebug>true</usedDebug>

@@ -45,7 +45,6 @@ extern TIM_HandleTypeDef htim6;
 extern UART_HandleTypeDef huart1;
 
 extern void TIM6_IRQHandler_MB(void);
-
 /******************************************************************************/
 /*            Cortex-M3 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/

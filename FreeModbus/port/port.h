@@ -34,10 +34,10 @@
 #define EXIT_CRITICAL_SECTION( )    __enable_irq()
 #define assert(val)                 assert_param(val)
 
-#define SLAVE_ADDRESS               1
+#define SLAVE_ADDRESS               7
 #define USB			                0
 #define RS_485						1
-#define BAUDRATE                    9600
+#define BAUDRATE                    115200
 
 typedef uint8_t BOOL;
 

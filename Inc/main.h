@@ -46,26 +46,19 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
-#define ON          (1)
-#define OFF         (0)
 
-
-#define LED_BLINK   (4000)
-
-#define HCTrig_Pin GPIO_PIN_6
-#define HCTrig_GPIO_Port GPIOC
-#define HCEcho_Pin GPIO_PIN_7
-#define HCEcho_GPIO_Port GPIOC
+#define Encoder_CLK_Pin GPIO_PIN_1
+#define Encoder_CLK_GPIO_Port GPIOA
+#define Encoder_DT_Pin GPIO_PIN_2
+#define Encoder_DT_GPIO_Port GPIOA
 #define Button_Pin GPIO_PIN_1
 #define Button_GPIO_Port GPIOB
-#define ENCODER_DT GPIO_PIN_0
-#define ENCODER_CLK GPIO_PIN_1
-#define LD1_Pin GPIO_PIN_10
-#define LD1_GPIO_Port GPIOA
-#define LD2_Pin GPIO_PIN_11
-#define LD2_GPIO_Port GPIOA
-#define LD3_Pin GPIO_PIN_8
-#define LD3_GPIO_Port GPIOС
+#define LD1_Pin GPIO_PIN_7
+#define LD1_GPIO_Port GPIOC
+#define LD2_Pin GPIO_PIN_8
+#define LD2_GPIO_Port GPIOC
+#define LD3_Pin GPIO_PIN_9
+#define LD3_GPIO_Port GPIOC
 #define PWM_Pin GPIO_PIN_8
 #define PWM_GPIO_Port GPIOA
 #define TMS_SWDIO_Pin GPIO_PIN_13
@@ -81,7 +74,10 @@
 /* #define USE_FULL_ASSERT    1U */
 
 /* USER CODE BEGIN Private defines */
+#define ON      (1)
+#define OFF     (0)
 
+#define LED_BLINK     (10000)
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
