@@ -29,7 +29,7 @@
     <heapSize>0x200</heapSize>
     <stackSize>0x400</stackSize>
     
-    	<cpuclock>24</cpuclock>
+    	<cpuclock>8</cpuclock>
     	<board>STM32VLDISCOVERY</board>
 			
     <usedDebug>true</usedDebug>

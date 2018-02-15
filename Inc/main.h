@@ -9,7 +9,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -53,11 +53,11 @@
 #define Encoder_DT_GPIO_Port GPIOA
 #define Button_Pin GPIO_PIN_1
 #define Button_GPIO_Port GPIOB
-#define LD1_Pin GPIO_PIN_7
+#define LD1_Pin GPIO_PIN_9
 #define LD1_GPIO_Port GPIOC
-#define LD2_Pin GPIO_PIN_8
+#define LD2_Pin GPIO_PIN_7
 #define LD2_GPIO_Port GPIOC
-#define LD3_Pin GPIO_PIN_9
+#define LD3_Pin GPIO_PIN_8
 #define LD3_GPIO_Port GPIOC
 #define PWM_Pin GPIO_PIN_8
 #define PWM_GPIO_Port GPIOA

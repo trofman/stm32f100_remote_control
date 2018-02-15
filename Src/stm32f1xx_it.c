@@ -4,7 +4,7 @@
   * @brief   Interrupt Service Routines.
   ******************************************************************************
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -44,7 +44,6 @@ extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim6;
 extern UART_HandleTypeDef huart1;
 
-extern void TIM6_IRQHandler_MB(void);
 /******************************************************************************/
 /*            Cortex-M3 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
